@@ -1,6 +1,6 @@
 <div align="center">
 
-# CustomSpeak V1.0
+# Threepio V1.0
 
 **Role-play your way to better English with Claude, Gemini, or ChatGPT.**
 
@@ -18,9 +18,9 @@
 
 ---
 
-## Why CustomSpeak?
+## Why Threepio?
 
-Most conversation-practice apps are generic. **You** are not — you have a specific paper to defend, a specific interview to prep for, a specific meeting tomorrow. CustomSpeak lets you hand the model your actual materials (your paper, slides, screenshots) and a role (e.g. *"you are a skeptical reviewer at NeurIPS"*), then talks back — out loud — so you can practice the *specific* conversation you're about to have.
+Most conversation-practice apps are generic. **You** are not — you have a specific paper to defend, a specific interview to prep for, a specific meeting tomorrow. Threepio lets you hand the model your actual materials (your paper, slides, screenshots) and a role (e.g. *"you are a skeptical reviewer at NeurIPS"*), then talks back — out loud — so you can practice the *specific* conversation you're about to have.
 
 Everything runs locally against your own API keys. No accounts, no subscription, no data sent to a third-party SaaS.
 
@@ -62,12 +62,12 @@ Everything runs locally against your own API keys. No accounts, no subscription,
 ### Install
 
 ```bash
-git clone https://github.com/<your-username>/customspeak.git
-cd customspeak
+git clone https://github.com/<your-username>/threepio.git
+cd threepio
 
 # Create an isolated environment (conda shown; venv also fine)
-conda create -n cspeak python=3.11 -y
-conda activate cspeak
+conda create -n threepio python=3.11 -y
+conda activate threepio
 pip install -r requirements.txt
 
 # Configure API keys — only fill in the ones you want to use
@@ -111,7 +111,7 @@ Only providers with a key set are offered in the UI dropdown.
 ## Project layout
 
 ```
-customspeak/
+threepio/
 ├── backend/
 │   ├── main.py         # FastAPI routes, SSE streaming
 │   ├── db.py           # SQLite schema + CRUD
@@ -151,7 +151,7 @@ Interactive docs are available at `/docs` when the server is running.
 
 ## Costs
 
-CustomSpeak is **not** a hosted service — there is nothing to pay the authors. API usage bills directly to your own account with the provider you chose. Typical per-session cost (a few short turns + a scoring call) is on the order of cents, but it depends on model choice and context size (attached PDFs are the biggest variable).
+Threepio is **not** a hosted service — there is nothing to pay the authors. API usage bills directly to your own account with the provider you chose. Typical per-session cost (a few short turns + a scoring call) is on the order of cents, but it depends on model choice and context size (attached PDFs are the biggest variable).
 
 ## Limitations (v1)
 

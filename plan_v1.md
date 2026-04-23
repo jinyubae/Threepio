@@ -1,14 +1,14 @@
-# CustomSpeak — 개인화 영어 회화 웹앱
+# Threepio — 개인화 영어 회화 웹앱
 
 ## Context
 사용자는 특정 주제·상황·역할을 지정해 선택한 LLM(Claude / Gemini / ChatGPT)과 **음성 또는 텍스트**로 영어 회화를 연습하고 싶어함. 예: 내 논문 PDF 여러 개를 첨부 → 역할 "논문 저자 vs ML 연구자", 상황 "학회 Q&A" → 모델이 먼저 질문하고 내가 답하는 대화 진행. 세션 종료 시 **① 어색한 표현 3~4개 교정 + ② 100점 만점의 점수(질·유창성·의미전달) 리포트**를 제공, 모든 세션은 저장·재열람 가능.
 
-현재 작업 디렉토리(`/Users/yujinbae/Desktop/code`)는 비어있는 [customspeak/](customspeak/) 폴더를 포함한 greenfield 상태.
+현재 작업 디렉토리(`/Users/yujinbae/Desktop/code`)는 비어있는 [threepio/](threepio/) 폴더를 포함한 greenfield 상태.
 
 ## 기술 스택 (결정됨)
 | 영역 | 선택 | 사유 |
 |------|------|------|
-| 실행 환경 | **conda env `cspeak` (Python 3.11)** | 사용자 요청, 의존성 격리 |
+| 실행 환경 | **conda env `threepio` (Python 3.11)** | 사용자 요청, 의존성 격리 |
 | 백엔드 | FastAPI + uvicorn | async/SSE 스트리밍, OpenAPI 문서 자동 |
 | DB | SQLite (`sqlite3` 표준) | 설치 불필요, 관계형 관리 |
 | LLM | **Claude / Gemini / ChatGPT 3종 전환 가능** | 세션 생성 시 선택, 각 프로바이더 API 사용 |
@@ -26,7 +26,7 @@
 
 ## 디렉토리 구조
 ```
-customspeak/
+threepio/
 ├── backend/
 │   ├── main.py            # FastAPI 라우트, SSE
 │   ├── db.py              # SQLite 스키마 + CRUD
@@ -84,7 +84,7 @@ CREATE TABLE attachments (
 );
 ```
 
-## LLM 추상화 ([customspeak/backend/llm/base.py](customspeak/backend/llm/base.py))
+## LLM 추상화 ([threepio/backend/llm/base.py](threepio/backend/llm/base.py))
 ```python
 class LLMClient(ABC):
     @abstractmethod
@@ -99,9 +99,9 @@ class LLMClient(ABC):
 ```
 
 **구현 차이**
-- **Claude** ([llm/claude.py](customspeak/backend/llm/claude.py)): `anthropic.AsyncAnthropic`. PDF는 `{type:"document", source:{type:"base64",...}}`, 이미지는 `{type:"image", ...}`. 첫 user message 첨부에 `cache_control: ephemeral` 적용.
-- **Gemini** ([llm/gemini.py](customspeak/backend/llm/gemini.py)): `google.genai` SDK. PDF·이미지 모두 `Part.from_bytes(mime_type=...)`로 첨부. 히스토리는 `contents=[Content(role="user"|"model", parts=[...])]`. 스트림은 `aio.models.generate_content_stream(...)`.
-- **OpenAI** ([llm/openai_impl.py](customspeak/backend/llm/openai_impl.py)): `openai.AsyncOpenAI` Chat Completions. 이미지는 `{type:"image_url", image_url:{url:"data:..."}}`. **PDF는 지원 안 됨 → `pypdf`로 텍스트 추출 후 system prompt에 `## Attached documents` 섹션으로 임베드**. 긴 문서는 프로바이더별 컨텍스트 한도 감안해 단순 truncate (v1).
+- **Claude** ([llm/claude.py](threepio/backend/llm/claude.py)): `anthropic.AsyncAnthropic`. PDF는 `{type:"document", source:{type:"base64",...}}`, 이미지는 `{type:"image", ...}`. 첫 user message 첨부에 `cache_control: ephemeral` 적용.
+- **Gemini** ([llm/gemini.py](threepio/backend/llm/gemini.py)): `google.genai` SDK. PDF·이미지 모두 `Part.from_bytes(mime_type=...)`로 첨부. 히스토리는 `contents=[Content(role="user"|"model", parts=[...])]`. 스트림은 `aio.models.generate_content_stream(...)`.
+- **OpenAI** ([llm/openai_impl.py](threepio/backend/llm/openai_impl.py)): `openai.AsyncOpenAI` Chat Completions. 이미지는 `{type:"image_url", image_url:{url:"data:..."}}`. **PDF는 지원 안 됨 → `pypdf`로 텍스트 추출 후 system prompt에 `## Attached documents` 섹션으로 임베드**. 긴 문서는 프로바이더별 컨텍스트 한도 감안해 단순 truncate (v1).
 
 ## 백엔드 엔드포인트
 | Method | Path | 역할 |
@@ -118,7 +118,7 @@ class LLMClient(ABC):
 
 **스트리밍**: `StreamingResponse`로 `text/event-stream`, 각 프로바이더의 델타 이벤트를 통일된 `data: {"delta": "..."}\n\n` 포맷으로 릴레이 → 프론트는 토큰 단위 버블 갱신 + 문장 종결 단위 TTS 큐잉.
 
-## 프롬프트 설계 ([customspeak/backend/prompts.py](customspeak/backend/prompts.py))
+## 프롬프트 설계 ([threepio/backend/prompts.py](threepio/backend/prompts.py))
 
 **회화 시스템 프롬프트**
 ```
@@ -136,7 +136,7 @@ Rules:
 ```
 **세션 시작 트리거**: 첫 user message에 `"Please begin by asking me your opening question."` + 첨부 content blocks.
 
-**피드백/채점 프롬프트** ([customspeak/backend/scoring.py](customspeak/backend/scoring.py))
+**피드백/채점 프롬프트** ([threepio/backend/scoring.py](threepio/backend/scoring.py))
 - 입력: 세션의 모든 user 메시지 (assistant 제외)
 - 모델: 해당 세션과 **동일한 프로바이더** 사용
 - 반환 JSON (엄격):
@@ -158,7 +158,7 @@ Rules:
 - 프롬프트 말미에 "반드시 JSON만 출력, 다른 설명 금지" 명시. 파싱: `json.loads` → 실패 시 ```json 펜스 제거 후 재시도 → 여전히 실패 시 `raw_feedback`에 원문 저장.
 - **Fluency의 한계 명시**: 텍스트만으로는 진짜 유창성(속도·일시정지) 측정 불가 → 프롬프트에 "문장 완결성, 망설임 표현(uh/um/like 등) 빈도, 자기 수정 빈도로 근사"라고 평가 기준 명시.
 
-## 프론트엔드 흐름 ([customspeak/frontend/app.js](customspeak/frontend/app.js))
+## 프론트엔드 흐름 ([threepio/frontend/app.js](threepio/frontend/app.js))
 
 1. **홈 (세션 목록)** — 제목·날짜·프로바이더 뱃지 + "새 세션" 버튼.
 2. **새 세션 생성 폼**
@@ -178,7 +178,7 @@ Rules:
 4. **세션 상세 뷰** — 과거 대화 + 점수·교정 전체 조회.
 
 ## 구현 순서
-1. **환경**: `conda create -n cspeak python=3.11 -y` → `conda activate cspeak` → `requirements.txt` 작성·설치
+1. **환경**: `conda create -n threepio python=3.11 -y` → `conda activate threepio` → `requirements.txt` 작성·설치
 2. `backend/db.py` — 스키마 초기화 + CRUD
 3. `backend/llm/base.py` + `claude.py` 먼저 → 단일턴→멀티턴→첨부 순으로 수동 검증
 4. `backend/main.py` — non-streaming 버전으로 세션·업로드·start·end 엔드포인트 완성, `/docs`로 E2E 확인
@@ -189,16 +189,16 @@ Rules:
 9. README: conda env 생성·활성화·`.env` 키 설정·실행 명령 정리
 
 ## 핵심 파일
-- [customspeak/backend/main.py](customspeak/backend/main.py) — 라우트·SSE
-- [customspeak/backend/llm/base.py](customspeak/backend/llm/base.py) — 공통 인터페이스
-- [customspeak/backend/llm/claude.py](customspeak/backend/llm/claude.py), [gemini.py](customspeak/backend/llm/gemini.py), [openai_impl.py](customspeak/backend/llm/openai_impl.py) — 프로바이더별 구현
-- [customspeak/backend/scoring.py](customspeak/backend/scoring.py) — 점수·교정 생성
-- [customspeak/backend/prompts.py](customspeak/backend/prompts.py) — 프롬프트
-- [customspeak/frontend/app.js](customspeak/frontend/app.js) — UI 상태·STT/TTS·SSE 소비
+- [threepio/backend/main.py](threepio/backend/main.py) — 라우트·SSE
+- [threepio/backend/llm/base.py](threepio/backend/llm/base.py) — 공통 인터페이스
+- [threepio/backend/llm/claude.py](threepio/backend/llm/claude.py), [gemini.py](threepio/backend/llm/gemini.py), [openai_impl.py](threepio/backend/llm/openai_impl.py) — 프로바이더별 구현
+- [threepio/backend/scoring.py](threepio/backend/scoring.py) — 점수·교정 생성
+- [threepio/backend/prompts.py](threepio/backend/prompts.py) — 프롬프트
+- [threepio/frontend/app.js](threepio/frontend/app.js) — UI 상태·STT/TTS·SSE 소비
 
 ## Verification
 **1. 환경 세팅**
-- `conda create -n cspeak python=3.11 -y && conda activate cspeak`
+- `conda create -n threepio python=3.11 -y && conda activate threepio`
 - `pip install -r requirements.txt`
 - `.env`에 최소 하나 이상의 API 키 설정
 

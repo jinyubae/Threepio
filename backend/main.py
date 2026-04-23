@@ -30,7 +30,7 @@ ALLOWED_MIMES = {
     "image/gif",
 }
 
-app = FastAPI(title="CustomSpeak")
+app = FastAPI(title="Threepio")
 
 
 @app.on_event("startup")
