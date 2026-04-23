@@ -1,6 +1,6 @@
 <div align="center">
 
-# Threepio V1.0
+# <img src="assets/threepio.webp" alt="" width="48" align="center"> Threepio V1.0
 
 **Role-play your way to better English with Claude, Gemini, or ChatGPT.**
 
