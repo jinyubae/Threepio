@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CustomSpeak</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>CustomSpeak</h1>
+    <nav id="nav"></nav>
+  </header>
+  <main id="app"></main>
+
+  <template id="tpl-home">
+    <section class="view view-home">
+      <div class="toolbar">
+        <h2>세션 목록</h2>
+        <button class="primary" data-action="new">+ 새 세션</button>
+      </div>
+      <ul class="session-list" data-slot="sessions"></ul>
+    </section>
+  </template>
+
+  <template id="tpl-new">
+    <section class="view view-new">
+      <h2>새 세션 만들기</h2>
+      <form data-slot="form">
+        <label>제목
+          <input name="title" required placeholder="예: 내 논문 학회 Q&A 연습" />
+        </label>
+        <label>LLM 모델
+          <select name="llm_provider" data-slot="provider" required></select>
+        </label>
+        <label>주제 (Topic)
+          <textarea name="topic" required rows="2" placeholder="내가 작성한 논문에 대한 설명"></textarea>
+        </label>
+        <label>상황 (Situation)
+          <textarea name="situation" required rows="2" placeholder="학회에서 논문을 발표한 뒤 질의응답을 받는 상황"></textarea>
+        </label>
+        <div class="row">
+          <label>내 역할
+            <input name="user_role" required placeholder="논문 저자" />
+          </label>
+          <label>모델 역할
+            <input name="model_role" required placeholder="ML 분야 연구자" />
+          </label>
+        </div>
+        <label>참고 자료 (PDF · 이미지, 복수 가능)
+          <input type="file" name="files" multiple accept=".pdf,image/*" />
+        </label>
+        <ul class="file-list" data-slot="files"></ul>
+        <div class="row end">
+          <button type="button" data-action="cancel">취소</button>
+          <button type="submit" class="primary">시작</button>
+        </div>
+      </form>
+    </section>
+  </template>
+
+  <template id="tpl-chat">
+    <section class="view view-chat">
+      <div class="toolbar">
+        <h2 data-slot="title"></h2>
+        <button class="danger" data-action="end">세션 종료</button>
+      </div>
+      <div class="chat" data-slot="chat"></div>
+      <div class="composer">
+        <button class="mic" data-action="mic" title="음성 입력">🎤</button>
+        <textarea data-slot="input" rows="2" placeholder="영어로 답하거나, 🎤를 눌러 말하세요. Enter 전송, Shift+Enter 줄바꿈"></textarea>
+        <button class="primary" data-action="send">전송</button>
+      </div>
+      <p class="hint" data-slot="hint"></p>
+    </section>
+  </template>
+
+  <template id="tpl-detail">
+    <section class="view view-detail">
+      <div class="toolbar">
+        <h2 data-slot="title"></h2>
+        <button data-action="back">← 목록으로</button>
+      </div>
+      <div class="meta" data-slot="meta"></div>
+      <div class="chat read-only" data-slot="chat"></div>
+      <div class="feedback" data-slot="feedback"></div>
+    </section>
+  </template>
+
+  <template id="tpl-feedback">
+    <div class="modal-backdrop">
+      <div class="modal">
+        <h3>세션 리포트</h3>
+        <div data-slot="body"></div>
+        <div class="row end">
+          <button class="primary" data-action="close">확인</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script src="/static/app.js" type="module"></script>
+</body>
+</html>
