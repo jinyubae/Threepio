@@ -195,5 +195,5 @@ Rough workflow:
 Built with [FastAPI](https://fastapi.tiangolo.com/), the [Anthropic](https://github.com/anthropics/anthropic-sdk-python), [google-genai](https://github.com/googleapis/python-genai), and [OpenAI](https://github.com/openai/openai-python) SDKs, [pypdf](https://github.com/py-pdf/pypdf), and the browser's native Web Speech / SpeechSynthesis APIs.
 
 ## License
-
+no commercial use, only for education
 MIT — see [LICENSE](LICENSE).
