@@ -84,6 +84,21 @@ button.danger {
 button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* home */
+.view-home { position: relative; overflow: hidden; padding-top: 9rem;}
+.home-logo {
+  position: fixed;
+  top: 35%;
+  left: 0.7rem;
+  transform: translateY(-50%);
+  height: 55vh;
+  width: auto;
+  opacity: 0.88;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+.view-home .toolbar,
+.view-home .session-list { position: relative; z-index: 1; }
 .session-list { list-style: none; padding: 0; margin: 0; }
 .session-list li {
   background: var(--surface);
